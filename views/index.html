@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="http://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <div id="btn">123</div>
+    <script>
+    $('#btn').on('click', function() {
+        $.ajax({
+            url: '/signup?htmlTest=1',
+            method: 'post',
+            data: {
+                hehe: 1,
+                haha: 2
+            },
+            success: function(resp) {
+                console.log(resp);
+            }
+        })
+    });
+    </script>
+</body>
+
+</html>
