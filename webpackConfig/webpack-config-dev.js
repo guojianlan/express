@@ -4,7 +4,7 @@ var projectRoot = path.join(__dirname,'../');
 
 module.exports = {
 	entry:{
-		app:['./webpackConfig/dev-client.js',,path.join(__dirname,'../assets/js/main.js')]
+		app:['./webpackConfig/dev-client.js',path.join(__dirname,'../assets/js/main.js')]
 	},
 	output:{
 		path:path.join(__dirname, '../dist'),
