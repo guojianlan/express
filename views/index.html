@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <div id="btn">123 development</div>
+    <app></app>
     <script>
     $('#btn').on('click', function() {
         $.ajax({
@@ -24,7 +24,26 @@
             }
         })
     });
+    $('.ceshi').on('change', function() {
+        var file = $(this)[0].files[0];
+        var formData = new FormData();
+        formData.append("uploadFile", file);
+        $.ajax({
+            type: "POST", // 上传文件要用POST
+            url: "/fileUpload/image",
+            dataType: "json",
+            crossDomain: true, // 如果用到跨域，需要后台开启CORS
+            processData: false, // 注意：不要 process data
+            contentType: false, // 注意：不设置 contentType
+            data: formData,
+            success:function(resp){
+              console.log(resp);
+            }
+        })
+    })
     </script>
+    <script src="/static/js/main.js"></script>
+    <script src="/app.js"></script>
 </body>
 
 </html>
