@@ -5,44 +5,10 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="/static/css/style.css">
-    <script src="http://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
 </head>
 
 <body>
-    <app></app>
-    <script>
-    $('#btn').on('click', function() {
-        $.ajax({
-            url: '/signup?htmlTest=1',
-            method: 'post',
-            data: {
-                hehe: 1,
-                haha: 2
-            },
-            success: function(resp) {
-                console.log(resp);
-            }
-        })
-    });
-    $('.ceshi').on('change', function() {
-        var file = $(this)[0].files[0];
-        var formData = new FormData();
-        formData.append("uploadFile", file);
-        $.ajax({
-            type: "POST", // 上传文件要用POST
-            url: "/fileUpload/image",
-            dataType: "json",
-            crossDomain: true, // 如果用到跨域，需要后台开启CORS
-            processData: false, // 注意：不要 process data
-            contentType: false, // 注意：不设置 contentType
-            data: formData,
-            success:function(resp){
-              console.log(resp);
-            }
-        })
-    })
-    </script>
-    <script src="/static/js/main.js"></script>
+    <div id="react-root"></div>
     <script src="/app.js"></script>
 </body>
 

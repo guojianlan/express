@@ -19,10 +19,11 @@ module.exports = {
     new webpack.NoErrorsPlugin()
   ],
   resolve: {
-    extensions: ['', '.js', '.vue'],
+    extensions: ['', '.js', '.jsx'],
     fallback: [path.join(__dirname, '../node_modules')],
     alias: {
-      'vue$': 'vue/dist/vue'
+      'vue$': 'vue/dist/vue',
+      'react$':'react/dist/react'
     }
   },
   resolveLoader: {
@@ -34,11 +35,10 @@ module.exports = {
   			test: /\.vue$/,
   			loader:'vue'
   		},
-  		{
-        test: /\.js$/,
-        loader: 'babel',
-        include: projectRoot,
-        exclude: /node_modules/
+      {
+          test: /\.jsx?$/,
+          exclude: /node_modules/,
+          loader: 'babel'
       },
       {
     		test: /\.scss$/,
