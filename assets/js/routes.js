@@ -17,24 +17,18 @@ const routes = {
         require.ensure([],(require)=>{
           cb(null,[
             {
-              path:'two',
+              path:'register',
               getComponents(partialNextState,cb){
                 require.ensure([],(require)=>{
                   cb(null,{
-                    mainLayout:require('./containers/CountModule/index.jsx').default
+                    headerLayout:require('./containers/AppModule/header.jsx').default,
+                    mainLayout:require('./containers/RegisterModule/index.jsx').default
                   })
                 })
-              },
-              getChildRoutes(partialNextState,cb){
-                require.ensure([],(require)=>{
-                  cb(null,[
-                    {
-                      path:'user',
-                      component:require('./containers/CountModule/child.jsx').default
-                    }
-                  ])
-                })
               }
+            },
+            {
+
             }
           ])
         })

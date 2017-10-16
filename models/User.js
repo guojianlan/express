@@ -1,8 +1,16 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var _MyUser = mongoose.Schema({
-    name: String
+const ObjectId = Schema.Types.ObjectId;
+var timestamps = require('mongoose-timestamp');
+var _MyUser = Schema({
+    mobile: String,
+    email:String,
+    password:String,
+    resumes:[
+       {type: ObjectId, ref: 'Resume'}
+    ],
+    resumeId:{ type: String, default: "" },
 });
-var User = mongoose.model('MyUser',_MyUser);
-/* global db */
+_MyUser.plugin(timestamps);
+var User = mongoose.model('User',_MyUser);
 module.exports = User;
