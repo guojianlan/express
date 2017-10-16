@@ -7,6 +7,7 @@ var Geetest = require('gt3-sdk');
 var bucket = 'resume-project'; //上传名字
 var accessKey = 'bu8QA-YZMrPmJisQdZuKq3inoi2T94U5WWIv9jkl';
 var secretKey = '7jeil1iGqsrHCYhIs45o0LrurKBtEfI6qvXE-VF-';
+var qnDomain = 'http://pic.yy5b.com/'
 var mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
 var options = {
   scope: bucket,
@@ -228,7 +229,7 @@ class user {
             }))
           }
           if (respInfo.statusCode == 200) {
-            var imageSrc = 'http://oxqyap2vg.bkt.clouddn.com/' + respBody.key;
+            var imageSrc = qnDomain + respBody.key;
             res.send(utils.resSuccessCode({
               data:{
                 imageUrl: imageSrc
