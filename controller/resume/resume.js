@@ -10,7 +10,7 @@ var _ = require('lodash')
 class Resume {
   constructor() {
     this.targetArr = ['target_position', 'target_salary', 'target_location', 'target_type'];
-    this.baseArr = ['user_name', 'sex', 'location_name', 'email', 'QQ', 'marital', 'political', 'wechat', 'weibo', 'zcool', 'zhihu', 'github'];
+    this.baseArr = ['user_name','birth_time','nationality','sex','name','header_img', 'location_name', 'email', 'QQ', 'marital', 'political', 'wechat', 'weibo', 'zcool', 'zhihu', 'github'];
     this.baseIntroArr = ['baseIntro'];
     this.hobbyArr = ['hobby'];
     this.skillArr = ['skill'];
@@ -32,6 +32,7 @@ class Resume {
     this.saveResumeBaseIntro = this.saveResumeBaseIntro.bind(this);
     this.saveResumeHobby = this.saveResumeHobby.bind(this);
     this.saveResumeSkill = this.saveResumeSkill.bind(this);
+    this.changeDefaultResule = this.changeDefaultResule.bind(this);
   }
   async getList(req, res, next) {
     var body = req.body;
@@ -63,6 +64,13 @@ class Resume {
     res.send(utils.resSuccessCode({
       data: user_doc
     }));
+  }
+  async changeDefaultResule(req,res,next){
+    var body = req.body;
+    req.session.user.resumeId = body.id;
+    res.send(utils.resSuccessCode({
+      data:body
+    }))
   }
   async getResume(req, res, next) {
     var body = req.body;

@@ -7,7 +7,7 @@ var _MyResume = Schema({
     //与用户关联
     uid:{ type: ObjectId, ref: 'User'},
     name:{type:String},
-    header_img:{type:String,default:"default.jpg"},
+    header_img:{type:String,default:""},
     user_name:{type:String,default:""},
     sex:{type:String,default:"1"}, //1男2女
     location_name:{type:String,default:""},
@@ -20,6 +20,8 @@ var _MyResume = Schema({
     zcool:{type:String,default:""},
     zhihu:{type:String,default:""},
     github:{type:String,default:""},
+    birth_time:{type:Date,default:""},
+    nationality:{type:String,default:""},//民族
     target_position:[],
     target_salary:{type:String,default:"0"},
     target_type:[],

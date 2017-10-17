@@ -229,7 +229,7 @@ class user {
             }))
           }
           if (respInfo.statusCode == 200) {
-            var imageSrc = qnDomain + respBody.key;
+            var imageSrc =  respBody.key;
             res.send(utils.resSuccessCode({
               data:{
                 imageUrl: imageSrc

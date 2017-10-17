@@ -18,4 +18,5 @@ router.post('/saveResumeCertificate',checkLogin,resume.saveResumeCertificate)
 router.post('/saveResumeBaseIntro',checkLogin,resume.saveResumeBaseIntro)
 router.post('/saveResumeHobby',checkLogin,resume.saveResumeHobby)
 router.post('/saveResumeSkill',checkLogin,resume.saveResumeSkill)
+router.post('/changeResumeDefault',checkLogin,resume.changeDefaultResule)
 export default router
