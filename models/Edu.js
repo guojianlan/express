@@ -8,8 +8,8 @@ var _MyEdu = Schema({
     college_name:{type:String,default:""},//学院名称
     major_name:{type:String,default:""},//专业名称
     degree:{type:String,default:""},//学历
-    start_time:{type:String}, //开始时间
-    end_time:{type:String}, //结束时间
+    start_time:{type:Date,default:""}, //开始时间
+    end_time:{type:Date,default:""}, //结束时间
     description:{type:String,default:""}//描述
 });
 _MyEdu.plugin(timestamps);

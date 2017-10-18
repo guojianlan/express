@@ -10,15 +10,15 @@ var _ = require('lodash')
 class Resume {
   constructor() {
     this.targetArr = ['target_position', 'target_salary', 'target_location', 'target_type'];
-    this.baseArr = ['user_name','birth_time','nationality','sex','name','header_img', 'location_name', 'email', 'QQ', 'marital', 'political', 'wechat', 'weibo', 'zcool', 'zhihu', 'github'];
+    this.baseArr = ['user_name', 'birth_time', 'nationality', 'sex', 'name', 'header_img', 'location_name', 'email', 'QQ', 'marital', 'political', 'wechat', 'weibo', 'zcool', 'zhihu', 'github'];
     this.baseIntroArr = ['baseIntro'];
     this.hobbyArr = ['hobby'];
     this.skillArr = ['skill'];
-    this.workArr = ['id', 'company_name', "type_id", "description",'position_name','start_time','end_time'];
-    this.eduexperienceArr = ['id', 'title', 'start_time','end_time','position','type_id', 'description'];
-    this.eduArr = ['id', 'school_name', 'college_name','major_name','degree','start_time','end_time','description'];
-    this.projectArr = ['id','name','description','start_time','end_time'];
-    this.certificateArr =['id','name','description','start_time','end_time']
+    this.workArr = ['company_name', "type_id", "description", 'position_name', 'start_time', 'end_time'];
+    this.eduexperienceArr = ['id', 'title', 'start_time', 'end_time', 'position', 'type_id', 'description'];
+    this.eduArr = ['id', 'school_name', 'college_name', 'major_name', 'degree', 'start_time', 'end_time', 'description'];
+    this.projectArr = ['id', 'name', 'description', 'start_time', 'end_time'];
+    this.certificateArr = ['id', 'name', 'description', 'start_time', 'end_time']
     this.getList = this.getList.bind(this)
     this.createResume = this.createResume.bind(this);
     this.getResume = this.getResume.bind(this);
@@ -65,18 +65,18 @@ class Resume {
       data: user_doc
     }));
   }
-  async changeDefaultResule(req,res,next){
+  async changeDefaultResule(req, res, next) {
     var body = req.body;
     req.session.user.resumeId = body.id;
     res.send(utils.resSuccessCode({
-      data:body
+      data: body
     }))
   }
   async getResume(req, res, next) {
     var body = req.body;
-    if(!req.session.user.resumeId){
+    if (!req.session.user.resumeId) {
       return res.send(utils.resErrorCode({
-        msg:"你还没有简历"
+        msg: "你还没有简历"
       }))
     }
     //传resumeId查找数据
@@ -88,17 +88,29 @@ class Resume {
     var hobby = _.cloneDeep(_.result(resume_doc, 'hobby'))
     var eduExperience = await EduExperienceModel.find({
       resumeId: req.session.user.resumeId
-    }).sort({start_time:1})
+    }).sort({
+      start_time: 1
+    })
     var edu = await EduModel.find({
       resumeId: req.session.user.resumeId
-    }).sort({start_time:-1})
+    }).sort({
+      start_time: -1
+    })
     var work = await WorkModel.find({
       resumeId: req.session.user.resumeId
-    }).sort({start_time:-1})
+    }).sort({
+      start_time: -1
+    })
     var project = await ProjectModel.find({
       resumeId: req.session.user.resumeId
-    }).sort({start_time:-1})
-    var certificate = await CertificateModel.find({resumeId: req.session.user.resumeId}).sort({start_time:-1})
+    }).sort({
+      start_time: -1
+    })
+    var certificate = await CertificateModel.find({
+      resumeId: req.session.user.resumeId
+    }).sort({
+      start_time: -1
+    })
     res.send(utils.resSuccessCode({
       data: {
         base,
@@ -127,7 +139,7 @@ class Resume {
       data: _.pick(resume, this.baseArr)
     }));
   }
-  async saveResumeBaseIntro(req,res,next){
+  async saveResumeBaseIntro(req, res, next) {
     var body = req.body;
     var resume = await ResumeModel.findByIdAndUpdate(req.session.user.resumeId,
       _.pick(body, this.baseIntroArr), {
@@ -138,7 +150,7 @@ class Resume {
       data: _.pick(resume, this.baseIntroArr)
     }));
   }
-  async saveResumeHobby(req,res,next){
+  async saveResumeHobby(req, res, next) {
     var body = req.body;
     if (!body.hobby) {
       body.hobby = [];
@@ -152,7 +164,7 @@ class Resume {
       data: _.pick(resume, this.hobbyArr)
     }));
   }
-  async saveResumeSkill(req,res,next){
+  async saveResumeSkill(req, res, next) {
     var body = req.body;
     if (!body.skill) {
       body.skill = [];
@@ -188,48 +200,68 @@ class Resume {
   }
   async saveResumeEdu(req, res, next) {
     var body = req.body;
-    var pushData = _.pick(body, this.eduArr)
-    if (body.id == 0 || _.isEmpty(body.id)) {
-      pushData.resumeId = req.session.user.resumeId;
-      var edu = new EduModel(pushData)
-      var edu_doc = await edu.save();
-      res.send(utils.resSuccessCode({
-        data: edu_doc
-      }));
-    } else {
-      var edu_doc = await EduModel.findByIdAndUpdate(body.id, pushData, {
-        new: true
-      });
-      res.send(utils.resSuccessCode({
-        data: edu_doc
-      }));
+    var eduA = body.edu;
+    for(var i = 0;i<eduA.length;i++){
+      var item = eduA[i];
+      if(item._id == 0 || _.isEmpty(item._id)){
+        var pushData = _.pick(item, this.eduArr)
+        pushData.resumeId = req.session.user.resumeId;
+        var work = new EduModel(pushData);
+        await work.save();
+      }else{
+        var pushData = _.pick(item, this.eduArr);
+        await EduModel.findByIdAndUpdate(item._id, pushData);
+      }
     }
+    var edu = await EduModel.find({
+      resumeId: req.session.user.resumeId
+    }).sort({
+      start_time: -1
+    })
+    res.send(utils.resSuccessCode(
+      {data:edu}
+    ));
+    // var body = req.body;
+    // var pushData = _.pick(body, this.eduArr)
+    // if (body.id == 0 || _.isEmpty(body.id)) {
+    //   pushData.resumeId = req.session.user.resumeId;
+    //   var edu = new EduModel(pushData)
+    //   var edu_doc = await edu.save();
+    //   res.send(utils.resSuccessCode({
+    //     data: edu_doc
+    //   }));
+    // } else {
+    //   var edu_doc = await EduModel.findByIdAndUpdate(body.id, pushData, {
+    //     new: true
+    //   });
+    //   res.send(utils.resSuccessCode({
+    //     data: edu_doc
+    //   }));
+    // }
   }
   async saveResumeWork(req, res, next) {
     var body = req.body;
-    var pushData = _.pick(body, this.workArr)
-    if (body.id == 0 || _.isEmpty(body.id)) {
-      pushData.resumeId = req.session.user.resumeId;
-      var work = new WorkModel(pushData)
-      var work_doc = await work.save();
-      res.send(utils.resSuccessCode({
-        data: work_doc
-      }));
-    } else {
-      try {
-        var work_doc = await WorkModel.findByIdAndUpdate(body.id, pushData, {
-          new: true
-        });
-        res.send(utils.resSuccessCode({
-          data: work_doc
-        }));
-      } catch (err) {
-        res.send(utils.resErrorCode({
-          code: "400500",
-          msg: "找不到数据"
-        }));
+    var workA = body.work;
+    for(var i = 0;i<workA.length;i++){
+      var item = workA[i];
+      if(item._id == 0 || _.isEmpty(item._id)){
+        var pushData = _.pick(item, this.workArr)
+        pushData.resumeId = req.session.user.resumeId;
+        var work = new WorkModel(pushData);
+        await work.save();
+      }else{
+        var pushData = _.pick(item, this.workArr);
+        await WorkModel.findByIdAndUpdate(item._id, pushData);
       }
     }
+    var work = await WorkModel.find({
+      resumeId: req.session.user.resumeId
+    }).sort({
+      start_time: -1
+    })
+    res.send(utils.resSuccessCode(
+      {data:work}
+    ));
   }
   async saveResumeEduExperience(req, res, next) {
     var body = req.body;
@@ -257,7 +289,7 @@ class Resume {
       }
     }
   }
-  async saveResumeProject(req,res,next){
+  async saveResumeProject(req, res, next) {
     var body = req.body;
     var pushData = _.pick(body, this.projectArr)
     if (body.id == 0 || _.isEmpty(body.id)) {
@@ -283,7 +315,7 @@ class Resume {
       }
     }
   }
-  async saveResumeCertificate(req,res,next){
+  async saveResumeCertificate(req, res, next) {
     var body = req.body;
     var pushData = _.pick(body, this.certificateArr)
     if (body.id == 0 || _.isEmpty(body.id)) {
