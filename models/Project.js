@@ -5,8 +5,8 @@ var Schema = mongoose.Schema;
 var _MyProject = Schema({
     resumeId:{type: Schema.ObjectId, ref: 'Resume'},
     name:{type:String,default:""}, //项目名称
-    start_time:{type:String,default:""},
-    end_time:{type:String,default:""},
+    start_time:{type:Date,default:""},
+    end_time:{type:Date,default:""},
     description:{type:String,default:""},
 });
 _MyProject.plugin(timestamps);

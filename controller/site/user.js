@@ -1,6 +1,7 @@
 var utils = require('../../utils/index.js')
 var Hashes = require('jshashes');
 var fs = require('fs');
+import ResumeModel from '../../models/Resume.js'
 import UserModel from '../../models/User'
 var qiniu = require('qiniu');
 var Geetest = require('gt3-sdk');
@@ -148,10 +149,18 @@ class user {
         mobile: req.body.mobile,
         password: password
       });
+      var MyResume = new ResumeModel({
+        uid: myUser.id,
+        name: 'reusme1'
+      })
+      myUser.resumeId = MyResume.id;
+      myUser.resumes.push(MyResume.id);
       var user_doc = await myUser.save();
+      var resume_doc = await MyResume.save();
       var user = user_doc.toObject();
       delete user.password
       req.session.user = user;
+      req.session.user.resumeId = MyResume.id;
       res.send(utils.resSuccessCode({
         data: user
       }))
