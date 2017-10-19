@@ -9,7 +9,7 @@ import CertificateModel from '../../models/Certificate'
 var _ = require('lodash')
 class Resume {
   constructor() {
-    this.targetArr = ['target_position', 'target_salary', 'target_location', 'target_type'];
+    this.targetArr = ['target_position', 'target_salary','target_industry', 'target_location', 'target_type'];
     this.baseArr = ['user_name', 'birth_time', 'nationality', 'sex', 'name', 'header_img', 'location_name', 'email', 'QQ', 'marital', 'political', 'wechat', 'weibo', 'zcool', 'zhihu', 'github'];
     this.baseIntroArr = ['baseIntro'];
     this.hobbyArr = ['hobby'];
@@ -33,6 +33,7 @@ class Resume {
     this.saveResumeHobby = this.saveResumeHobby.bind(this);
     this.saveResumeSkill = this.saveResumeSkill.bind(this);
     this.changeDefaultResule = this.changeDefaultResule.bind(this);
+    this.saveReumeName = this.saveReumeName.bind(this);
   }
   async getList(req, res, next) {
     var body = req.body;
@@ -150,6 +151,18 @@ class Resume {
       data: _.pick(resume, this.baseIntroArr)
     }));
   }
+  async saveReumeName(req,res,next){
+    var body = req.body;
+    console.log(body);
+    if(body.resumeName!=''){
+      var resume = await ResumeModel.findByIdAndUpdate(req.session.user.resumeId,
+        {name:body.resumeName}, {
+          new: true
+        }
+      )
+      res.send(utils.resSuccessCode());
+    }
+  }
   async saveResumeHobby(req, res, next) {
     var body = req.body;
     if (!body.hobby) {
@@ -189,6 +202,9 @@ class Resume {
     if (!body.target_type) {
       body.target_type = [];
     }
+    if(!body.target_industry){
+      body.target_industry = [];
+    }
     var resume = await ResumeModel.findByIdAndUpdate(req.session.user.resumeId,
       _.pick(body, this.targetArr), {
         new: true
@@ -221,23 +237,6 @@ class Resume {
     res.send(utils.resSuccessCode(
       {data:edu}
     ));
-    // var body = req.body;
-    // var pushData = _.pick(body, this.eduArr)
-    // if (body.id == 0 || _.isEmpty(body.id)) {
-    //   pushData.resumeId = req.session.user.resumeId;
-    //   var edu = new EduModel(pushData)
-    //   var edu_doc = await edu.save();
-    //   res.send(utils.resSuccessCode({
-    //     data: edu_doc
-    //   }));
-    // } else {
-    //   var edu_doc = await EduModel.findByIdAndUpdate(body.id, pushData, {
-    //     new: true
-    //   });
-    //   res.send(utils.resSuccessCode({
-    //     data: edu_doc
-    //   }));
-    // }
   }
   async saveResumeWork(req, res, next) {
     var body = req.body;

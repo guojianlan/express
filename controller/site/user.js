@@ -237,6 +237,7 @@ class user {
               error: respErr
             }))
           }
+         
           if (respInfo.statusCode == 200) {
             var imageSrc =  respBody.key;
             res.send(utils.resSuccessCode({
@@ -247,6 +248,7 @@ class user {
           } else {
             res.send(utils.resErrorCode({
               msg: '上传失败',
+              data:respInfo
             }))
           }
           // 上传之后删除本地文件

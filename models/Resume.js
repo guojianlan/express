@@ -23,9 +23,10 @@ var _MyResume = Schema({
     birth_time:{type:Date,default:""},
     nationality:{type:String,default:""},//民族
     target_position:[],
-    target_salary:{type:String,default:"0"},
+    target_salary:{type:String,default:""},
     target_type:[],
     target_location:[],
+    target_industry:[], //期望行业
     hobby:[],
     skill:[],
     baseIntro:{type:String,default:""},
