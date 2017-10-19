@@ -9,7 +9,7 @@ import CertificateModel from '../../models/Certificate'
 var _ = require('lodash')
 class Resume {
   constructor() {
-    this.targetArr = ['target_position', 'target_salary','target_industry', 'target_location', 'target_type'];
+    this.targetArr = ['target_position', 'target_salary', 'target_industry', 'target_location', 'target_type'];
     this.baseArr = ['user_name', 'birth_time', 'nationality', 'sex', 'name', 'header_img', 'location_name', 'email', 'QQ', 'marital', 'political', 'wechat', 'weibo', 'zcool', 'zhihu', 'github'];
     this.baseIntroArr = ['baseIntro'];
     this.hobbyArr = ['hobby'];
@@ -151,15 +151,15 @@ class Resume {
       data: _.pick(resume, this.baseIntroArr)
     }));
   }
-  async saveReumeName(req,res,next){
+  async saveReumeName(req, res, next) {
     var body = req.body;
     console.log(body);
-    if(body.resumeName!=''){
-      var resume = await ResumeModel.findByIdAndUpdate(req.session.user.resumeId,
-        {name:body.resumeName}, {
-          new: true
-        }
-      )
+    if (body.resumeName != '') {
+      var resume = await ResumeModel.findByIdAndUpdate(req.session.user.resumeId, {
+        name: body.resumeName
+      }, {
+        new: true
+      })
       res.send(utils.resSuccessCode());
     }
   }
@@ -202,7 +202,7 @@ class Resume {
     if (!body.target_type) {
       body.target_type = [];
     }
-    if(!body.target_industry){
+    if (!body.target_industry) {
       body.target_industry = [];
     }
     var resume = await ResumeModel.findByIdAndUpdate(req.session.user.resumeId,
@@ -217,14 +217,14 @@ class Resume {
   async saveResumeEdu(req, res, next) {
     var body = req.body;
     var eduA = body.edu;
-    for(var i = 0;i<eduA.length;i++){
+    for (var i = 0; i < eduA.length; i++) {
       var item = eduA[i];
-      if(item._id == 0 || _.isEmpty(item._id)){
+      if (item._id == 0 || _.isEmpty(item._id)) {
         var pushData = _.pick(item, this.eduArr)
         pushData.resumeId = req.session.user.resumeId;
         var work = new EduModel(pushData);
         await work.save();
-      }else{
+      } else {
         var pushData = _.pick(item, this.eduArr);
         await EduModel.findByIdAndUpdate(item._id, pushData);
       }
@@ -234,21 +234,21 @@ class Resume {
     }).sort({
       start_time: -1
     })
-    res.send(utils.resSuccessCode(
-      {data:edu}
-    ));
+    res.send(utils.resSuccessCode({
+      data: edu
+    }));
   }
   async saveResumeWork(req, res, next) {
     var body = req.body;
     var workA = body.work;
-    for(var i = 0;i<workA.length;i++){
+    for (var i = 0; i < workA.length; i++) {
       var item = workA[i];
-      if(item._id == 0 || _.isEmpty(item._id)){
+      if (item._id == 0 || _.isEmpty(item._id)) {
         var pushData = _.pick(item, this.workArr)
         pushData.resumeId = req.session.user.resumeId;
         var work = new WorkModel(pushData);
         await work.save();
-      }else{
+      } else {
         var pushData = _.pick(item, this.workArr);
         await WorkModel.findByIdAndUpdate(item._id, pushData);
       }
@@ -258,86 +258,98 @@ class Resume {
     }).sort({
       start_time: -1
     })
-    res.send(utils.resSuccessCode(
-      {data:work}
-    ));
+    res.send(utils.resSuccessCode({
+      data: work
+    }));
   }
   async saveResumeEduExperience(req, res, next) {
     var body = req.body;
-    var pushData = _.pick(body, this.eduexperienceArr)
-    if (body.id == 0 || _.isEmpty(body.id)) {
-      pushData.resumeId = req.session.user.resumeId;
-      var eduExperience = new EduExperienceModel(pushData)
-      var eduExperience_doc = await eduExperience.save();
-      res.send(utils.resSuccessCode({
-        data: eduExperience_doc
-      }));
+    var eduexperienceA = body.eduexperience;
+    if (!eduexperienceA.length) {
+      res.send(utils.resErrorCode({
+        msg: "请传入eduexperience"
+      }))
     } else {
-      try {
-        var eduExperience_doc = await EduExperienceModel.findByIdAndUpdate(body.id, pushData, {
-          new: true
-        });
-        res.send(utils.resSuccessCode({
-          data: eduExperience_doc
-        }));
-      } catch (err) {
-        res.send(utils.resErrorCode({
-          code: "400500",
-          msg: "找不到数据"
-        }));
+      for (var i = 0; i < eduexperienceA.length; i++) {
+        var item = eduexperienceA[i];
+        if (item._id == 0 || _.isEmpty(item._id)) {
+          var pushData = _.pick(item, this.eduexperienceArr)
+          pushData.resumeId = req.session.user.resumeId;
+          var eduexperience = new EduExperienceModel(pushData);
+          await eduexperience.save();
+        } else {
+          var pushData = _.pick(item, this.eduexperienceArr);
+          await EduExperienceModel.findByIdAndUpdate(item._id, pushData);
+        }
       }
+      var eduexperience = await EduExperienceModel.find({
+        resumeId: req.session.user.resumeId
+      }).sort({
+        start_time: -1
+      })
+      res.send(utils.resSuccessCode({
+        data: eduexperience
+      }));
     }
   }
   async saveResumeProject(req, res, next) {
     var body = req.body;
-    var pushData = _.pick(body, this.projectArr)
-    if (body.id == 0 || _.isEmpty(body.id)) {
-      pushData.resumeId = req.session.user.resumeId;
-      var project = new ProjectModel(pushData)
-      var project_doc = await project.save();
-      res.send(utils.resSuccessCode({
-        data: project_doc
-      }));
+    var projectA = body.project;
+    if (!projectA.length) {
+      res.send(utils.resErrorCode({
+        msg: "请传入project"
+      }))
     } else {
-      try {
-        var project_doc = await ProjectModel.findByIdAndUpdate(body.id, pushData, {
-          new: true
-        });
-        res.send(utils.resSuccessCode({
-          data: project_doc
-        }));
-      } catch (err) {
-        res.send(utils.resErrorCode({
-          code: "400500",
-          msg: "找不到数据"
-        }));
+      for (var i = 0; i < projectA.length; i++) {
+        var item = projectA[i];
+        if (item._id == 0 || _.isEmpty(item._id)) {
+          var pushData = _.pick(item, this.projectArr)
+          pushData.resumeId = req.session.user.resumeId;
+          var project = new ProjectModel(pushData);
+          await project.save();
+        } else {
+          var pushData = _.pick(item, this.projectArr);
+          await ProjectModel.findByIdAndUpdate(item._id, pushData);
+        }
       }
+      var project = await ProjectModel.find({
+        resumeId: req.session.user.resumeId
+      }).sort({
+        start_time: -1
+      })
+      res.send(utils.resSuccessCode({
+        data: project
+      }));
     }
   }
   async saveResumeCertificate(req, res, next) {
     var body = req.body;
-    var pushData = _.pick(body, this.certificateArr)
-    if (body.id == 0 || _.isEmpty(body.id)) {
-      pushData.resumeId = req.session.user.resumeId;
-      var certificate = new CertificateModel(pushData)
-      var certificate_doc = await certificate.save();
-      res.send(utils.resSuccessCode({
-        data: certificate_doc
-      }));
+    var certificateA = body.certificate;
+    if (!certificateA.length) {
+      res.send(utils.resErrorCode({
+        msg: "请传入certificate"
+      }))
     } else {
-      try {
-        var certificate_doc = await CertificateModel.findByIdAndUpdate(body.id, pushData, {
-          new: true
-        });
-        res.send(utils.resSuccessCode({
-          data: certificate_doc
-        }));
-      } catch (err) {
-        res.send(utils.resErrorCode({
-          code: "400500",
-          msg: "找不到数据"
-        }));
+      for (var i = 0; i < certificateA.length; i++) {
+        var item = certificateA[i];
+        if (item._id == 0 || _.isEmpty(item._id)) {
+          var pushData = _.pick(item, this.certificateArr)
+          pushData.resumeId = req.session.user.resumeId;
+          var certificate = new CertificateModel(pushData);
+          await certificate.save();
+        } else {
+          var pushData = _.pick(item, this.certificateArr);
+          await CertificateModel.findByIdAndUpdate(item._id, pushData);
+        }
       }
+      var certificate = await CertificateModel.find({
+        resumeId: req.session.user.resumeId
+      }).sort({
+        start_time: -1
+      })
+      res.send(utils.resSuccessCode({
+        data: certificate
+      }));
     }
   }
 }
