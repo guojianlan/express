@@ -34,6 +34,11 @@ class Resume {
     this.saveResumeSkill = this.saveResumeSkill.bind(this);
     this.changeDefaultResule = this.changeDefaultResule.bind(this);
     this.saveReumeName = this.saveReumeName.bind(this);
+    this.deleteResumeWork = this.deleteResumeWork.bind(this);
+    this.deleteResumeEdu = this.deleteResumeEdu.bind(this);
+    this.deleteResumeEduexperience = this.deleteResumeEduexperience.bind(this);
+    this.deleteResumeProject = this.deleteResumeProject.bind(this);
+    this.deleteResumeCertificate = this.deleteResumeCertificate.bind(this);
   }
   async getList(req, res, next) {
     var body = req.body;
@@ -238,6 +243,20 @@ class Resume {
       data: edu
     }));
   }
+  async deleteResumeEdu(req,res,next){
+    let {id} = req.body;
+    if(id){
+      await EduModel.findByIdAndRemove(id);
+      res.send(utils.resSuccessCode({
+        data:id
+      }))
+    }else{
+      res.send(utils.resErrorCode({
+        msg:'请传入要删除的id'
+      }))
+    }
+    
+  }
   async saveResumeWork(req, res, next) {
     var body = req.body;
     var workA = body.work;
@@ -261,6 +280,20 @@ class Resume {
     res.send(utils.resSuccessCode({
       data: work
     }));
+  }
+  async deleteResumeWork(req,res,next){
+    let {id} = req.body;
+    if(id){
+      await WorkModel.findByIdAndRemove(id);
+      res.send(utils.resSuccessCode({
+        data:id
+      }))
+    }else{
+      res.send(utils.resErrorCode({
+        msg:'请传入要删除的id'
+      }))
+    }
+    
   }
   async saveResumeEduExperience(req, res, next) {
     var body = req.body;
@@ -290,6 +323,19 @@ class Resume {
       res.send(utils.resSuccessCode({
         data: eduexperience
       }));
+    }
+  }
+  async deleteResumeEduexperience(req, res, next){
+    let {id} = req.body;
+    if(id){
+      await EduExperienceModel.findByIdAndRemove(id);
+      res.send(utils.resSuccessCode({
+        data:id
+      }))
+    }else{
+      res.send(utils.resErrorCode({
+        msg:'请传入要删除的id'
+      }))
     }
   }
   async saveResumeProject(req, res, next) {
@@ -322,6 +368,19 @@ class Resume {
       }));
     }
   }
+  async deleteResumeProject(req, res, next){
+    let {id} = req.body;
+    if(id){
+      await ProjectModel.findByIdAndRemove(id);
+      res.send(utils.resSuccessCode({
+        data:id
+      }))
+    }else{
+      res.send(utils.resErrorCode({
+        msg:'请传入要删除的id'
+      }))
+    }
+  }
   async saveResumeCertificate(req, res, next) {
     var body = req.body;
     var certificateA = body.certificate;
@@ -350,6 +409,19 @@ class Resume {
       res.send(utils.resSuccessCode({
         data: certificate
       }));
+    }
+  }
+  async deleteResumeCertificate(req, res, next){
+    let {id} = req.body;
+    if(id){
+      await CertificateModel.findByIdAndRemove(id);
+      res.send(utils.resSuccessCode({
+        data:id
+      }))
+    }else{
+      res.send(utils.resErrorCode({
+        msg:'请传入要删除的id'
+      }))
     }
   }
 }
