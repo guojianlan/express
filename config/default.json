@@ -5,5 +5,9 @@
 			 "key": "gj_session",
 			 "maxAge": 2592000000
 	 	},
-	"mongodb": "mongodb://cvAdmin:5201314qv@localhost:27017/cv?authSource=admin"
+		"mongodb": "mongodb://cvAdmin:5201314qv@localhost:27017/cv?authSource=admin",
+		"redis":{
+			"port":"6379",
+			"link":"127.0.0.1"
+		}
 }

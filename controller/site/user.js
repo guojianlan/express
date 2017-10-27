@@ -10,7 +10,7 @@ const accessKey = 'bu8QA-YZMrPmJisQdZuKq3inoi2T94U5WWIv9jkl';
 const secretKey = '7jeil1iGqsrHCYhIs45o0LrurKBtEfI6qvXE-VF-';
 const nodemailer = require('nodemailer');
 const SMSClient = require('@alicloud/sms-sdk');
-
+const redisConfig = require('config').get('redis');
 const accessKeyId = 'LTAIAEuuEXE27O5p';
 const secretAccessKey = 'mLMCKYSbT3YxChw6WwVxyqeTOh9QOg';
 let smsClient = new SMSClient({
@@ -131,7 +131,7 @@ class user {
     } = req.body;
     if (mobile != '') {
       var code = utils.randomNumber();
-      var client = await redis.createClient();
+      var client = await redis.createClient(redisConfig.port,redisConfig.link);
       var redeisKey = await client.getAsync(mobile);
       if (redeisKey) { // 原本就有
         redeisKey += `,${code}`
