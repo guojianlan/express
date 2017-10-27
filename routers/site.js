@@ -11,4 +11,8 @@ router.post('/register', User.register)
 router.get('/logout',User.logout)
 router.get('/gt/register',User.gtRegister);
 router.post('/saveHeaderImage',User.saveHeaderImage)
+router.post('/forgetPass',User.forgetPass)
+router.post('/reBindPass',User.reBindPass)
+router.post('/SendMobileCode',User.SendMobileCode)
+router.get('/createPdf',User.createPdf)
 export default router

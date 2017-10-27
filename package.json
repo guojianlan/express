@@ -4,11 +4,13 @@
   "description": "test",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --harmony ./app.js"
+    "dev": "nodemon --harmony ./app.js",
+    "build":"NODE_ENV=production node --harmony ./app.js"
   },
   "author": "guojian",
   "license": "ISC",
   "dependencies": {
+    "@alicloud/sms-sdk": "^1.0.2",
     "autoprefixer": "6.5.3",
     "babel-core": "^6.18.2",
     "babel-loader": "6.2.8",
@@ -32,10 +34,12 @@
     "extract-text-webpack-plugin": "1.0.1",
     "formidable": "1.0.17",
     "gt3-sdk": "^2.0.0",
+    "ioredis": "^3.1.4",
     "jsx-loader": "0.13.2",
     "lodash": "4.17.2",
     "mongoose": "4.7.0",
     "node-sass": "3.13.0",
+    "nodemailer": "^4.2.0",
     "react": "15.4.1",
     "react-dom": "15.4.1",
     "react-redux": "4.4.6",
@@ -50,12 +54,14 @@
     "vue-template-compiler": "2.1.4",
     "webpack": "1.13.3",
     "webpack-dev-middleware": "1.8.4",
-    "webpack-hot-middleware": "2.13.2"
+    "webpack-hot-middleware": "2.13.2",
+    "wkhtmltopdf": "^0.3.4"
   },
   "devDependencies": {
     "babel-preset-stage-3": "^6.24.1",
     "jshashes": "^1.0.7",
     "mongoose-timestamp": "^0.6.0",
-    "qiniu": "^7.0.9"
+    "qiniu": "^7.0.9",
+    "uuid": "^3.1.0"
   }
 }

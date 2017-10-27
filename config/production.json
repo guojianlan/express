@@ -1,0 +1,9 @@
+{
+  "port": 3001,
+ "session":{
+    "secret": "mySession",
+    "key": "gj_session",
+    "maxAge": 2592000000
+  },
+"mongodb": "mongodb://cvAdmin:5201314qv@localhost:49998/cv?authSource=admin"
+}

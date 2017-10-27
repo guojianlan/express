@@ -6,8 +6,25 @@ import UserModel from '../../models/User'
 var qiniu = require('qiniu');
 var Geetest = require('gt3-sdk');
 var bucket = 'resume-project'; //上传名字
-var accessKey = 'bu8QA-YZMrPmJisQdZuKq3inoi2T94U5WWIv9jkl';
-var secretKey = '7jeil1iGqsrHCYhIs45o0LrurKBtEfI6qvXE-VF-';
+const accessKey = 'bu8QA-YZMrPmJisQdZuKq3inoi2T94U5WWIv9jkl';
+const secretKey = '7jeil1iGqsrHCYhIs45o0LrurKBtEfI6qvXE-VF-';
+const nodemailer = require('nodemailer');
+const SMSClient = require('@alicloud/sms-sdk');
+
+const accessKeyId = 'LTAIAEuuEXE27O5p';
+const secretAccessKey = 'mLMCKYSbT3YxChw6WwVxyqeTOh9QOg';
+let smsClient = new SMSClient({
+  accessKeyId,
+  secretAccessKey
+})
+var wkhtmltopdf = require('wkhtmltopdf');  
+var fs = require("fs");  
+const redis = require('redis');
+var bluebird = require('bluebird');
+bluebird.promisifyAll(redis.RedisClient.prototype);
+bluebird.promisifyAll(redis.Multi.prototype);
+var _ = require('lodash')
+// var client = redis.createClient();
 var qnDomain = 'http://pic.yy5b.com/'
 var mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
 var options = {
@@ -31,6 +48,10 @@ class user {
     this.gtRegister = this.gtRegister.bind(this);
     this.captchavalidata = this.captchavalidata.bind(this);
     this.saveHeaderImage = this.saveHeaderImage.bind(this);
+    this.forgetPass = this.forgetPass.bind(this);
+    this.reBindPass = this.reBindPass.bind(this);
+    this.SendMobileCode = this.SendMobileCode.bind(this);
+    this.createPdf = this.createPdf.bind(this);
   }
   async checkLogin(req, res, next) {
     //检测是否已经登录
@@ -38,15 +59,29 @@ class user {
       return res.send(utils.resErrorCode({
         code: 40121
       }));
+    } else {
+      res.send(utils.resSuccessCode({
+        data: {
+          is_login: req.session.user ? 1 : 0
+        }
+      }));
     }
-    res.send(utils.resSuccessCode({
-      data: {
-        is_login: req.session.user ? 1 : 0
-      }
-    }));
+
+  }
+  async createPdf(req,res,next){
+   try{
+    wkhtmltopdf('http://127.0.0.1:3001/ceshiPage', {pageSize: 'letter',output:'uploads/out4.pdf' },function(code, signal){
+      res.send(utils.resSuccessCode());
+    });
+   }catch(error){
+    res.send(utils.resErrorCode({
+      error:error
+    }))
+   }
   }
   async login(req, res, next) {
     //登录
+
     var SHA1 = new Hashes.SHA1;
     var body = req.body;
     var userDoc = await UserModel.findOne({
@@ -61,8 +96,9 @@ class user {
         delete user.password
         req.session.user = user;
         res.send(utils.resSuccessCode({
-          data: user
+          data: user,
         }))
+
       } else {
         res.send(utils.resSuccessCode({
           data: {},
@@ -88,6 +124,52 @@ class user {
         msg: "退出成功"
       }
     }))
+  }
+  async SendMobileCode(req, res, next) {
+    let {
+      mobile
+    } = req.body;
+    if (mobile != '') {
+      var code = utils.randomNumber();
+      var client = await redis.createClient();
+      var redeisKey = await client.getAsync(mobile);
+      if (redeisKey) { // 原本就有
+        redeisKey += `,${code}`
+      } else {
+        redeisKey = code;
+      }
+      try {
+        var smsRes = await smsClient.sendSMS({
+          PhoneNumbers: mobile,
+          SignName: '郭坚',
+          TemplateCode: 'SMS_105960040',
+          TemplateParam: '{"code":' + code + '}'
+        })
+        if (smsRes.Code == 'OK') {
+          await client.setAsync(mobile, redeisKey, 'EX', 300);
+
+          res.send(utils.resSuccessCode({
+            data: mobile,
+            code: code
+          }))
+        } else {
+          res.send(utils.resErrorCode({
+            msg: "发送验证码失败",
+            error: smsRes,
+          }))
+        }
+      } catch (error) {
+        res.send(utils.resErrorCode({
+          msg: "发送验证码失败",
+          error: error,
+        }))
+      }
+    } else {
+      res.send(utils.resErrorCode({
+        code: "mobile",
+        msg: "请填写手机号"
+      }))
+    }
   }
   captchavalidata(req, res, next) {
     return new Promise((resolve, reject) => {
@@ -237,18 +319,18 @@ class user {
               error: respErr
             }))
           }
-         
+
           if (respInfo.statusCode == 200) {
-            var imageSrc =  respBody.key;
+            var imageSrc = respBody.key;
             res.send(utils.resSuccessCode({
-              data:{
+              data: {
                 imageUrl: imageSrc
               }
             }))
           } else {
             res.send(utils.resErrorCode({
               msg: '上传失败',
-              data:respInfo
+              data: respInfo
             }))
           }
           // 上传之后删除本地文件
@@ -256,6 +338,78 @@ class user {
         });
       }
     })
+
+  }
+  async forgetPass(req, res, next) {
+    res.cookie('isVisit', 1, {
+      maxAge: 60 * 1000
+    });
+    let {
+      user
+    } = req.body;
+
+    var newusession = utils.randomString(12);
+    req.session.user = null;
+    req.session.newUser = user;
+    req.session.newusession = newusession;
+    nodemailer.createTestAccount((err, account) => {
+      // create reusable transporter object using the default SMTP transport
+      let transporter = nodemailer.createTransport({
+        host: 'smtp.qq.com',
+        port: 465,
+        secure: true, // true for 465, false for other ports
+        auth: {
+          user: '424139777@qq.com', // generated ethereal user
+          pass: 'qukdvtzogtlgbjgg' // generated ethereal password
+        }
+      });
+
+      // setup email data with unicode symbols
+      let mailOptions = {
+        from: '"测试发送邮件" <424139777@qq.com>', // sender address
+        to: '188-265@163.com', // list of receivers
+        subject: 'Hello11', // Subject line
+        text: 'Hello world111?', // plain text body
+        html: '<b>是否修改密码</b><a href=' + req.headers.origin + '/bindPass?sess_id=' + newusession + '>' + req.headers.origin + '/bindPass?sess_id=' + newusession + '</>' // html body
+      };
+      // send mail with defined transport object
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          return res.send(utils.resErrorCode({
+            error: error
+          }))
+        }
+        res.send(utils.resSuccessCode({
+          data: user,
+          sess_id: newusession
+        }))
+      });
+    });
+  }
+  async reBindPass(req, res, next) {
+    var usession = req.session.newusession;
+    let {
+      password,
+      sess_id
+    } = req.body;
+    if (usession != sess_id) {
+      return res.send(utils.resErrorCode({
+        msg: "你没有权限操作"
+      }))
+    } else {
+      var SHA1 = new Hashes.SHA1;
+      password = SHA1.hex(password);
+      var userDoc = await UserModel.findOne({
+        mobile: req.session.newUser
+      })
+      //查找手机号码
+      await UserModel.update({
+        mobile: req.session.newUser
+      }, {
+        password: password
+      })
+      return res.send(utils.resSuccessCode())
+    }
 
   }
 }

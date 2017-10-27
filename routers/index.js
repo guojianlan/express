@@ -12,6 +12,7 @@ let mergeBody  = require('../middleware/mergeBody.js');
 // let resume = require('./resumes.js');
 import site from './site.js'
 import resume from './resume.js'
+import resumeView from './resumeView.js'
 module.exports = function(app){
     // app.use('/site/register',mergeBody,register)
     // app.use('/hehe/site/register',mergeBody,register)
@@ -27,4 +28,6 @@ module.exports = function(app){
     // app.use('/site/resume',mergeBody,resume)
     app.use('/api/v1',mergeBody,site)
     app.use('/api/resume',mergeBody,resume)
+    app.use('/template',mergeBody,resumeView)
+  
 }
