@@ -63,17 +63,14 @@ var getIPAdress = function () {
 };
 
 router(app);
-app.use('/ceshiPage', (req, res) => {
-  return res.render(path.join(__dirname,'public','ceshiPage/index.html'));
-})
 app.use('/page/preview',(req,res)=>{
   return res.render(path.join(__dirname,'public','template/viewer.html'),{
     cvUrl:'/uploads/out4.pdf'
   });
 })
-app.use('*', (req, res) => {
-  return res.render(path.join(__dirname,'public','cv/index.html'));
-})
+// app.use('*', (req, res) => {
+//   return res.render(path.join(__dirname,'public','cv/index.html'));
+// })
 
 var server = app.listen(config.get('port'), () => {
   var host = getIPAdress();
