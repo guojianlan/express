@@ -68,9 +68,9 @@ app.use('/page/preview',(req,res)=>{
     cvUrl:'/uploads/out4.pdf'
   });
 })
-// app.use('*', (req, res) => {
-//   return res.render(path.join(__dirname,'public','cv/index.html'));
-// })
+app.use('*', (req, res) => {
+  return res.render(path.join(__dirname,'public','cv/index.html'));
+})
 
 var server = app.listen(config.get('port'), () => {
   var host = getIPAdress();
