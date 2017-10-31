@@ -13,7 +13,7 @@ const accessKeyId = 'LTAIAEuuEXE27O5p';
 const secretAccessKey = 'mLMCKYSbT3YxChw6WwVxyqeTOh9QOg';
 const ossClient = new OSS({
   region: 'oss-cn-shenzhen',
-  endpoint:"http://pic.yy5b.com",
+  endpoint:"https://pic.yy5b.com",
   accessKeyId: accessKeyId,
   accessKeySecret: secretAccessKey,
   cname:true
@@ -308,7 +308,7 @@ class user {
         var localFile = filePath;
         var key = fileName;
         var date = new Date();
-        var ossDir = f `upload/images/${date.getFullYear()+''+(date.getMonth()<9?'0'+(date.getMonth()+1):(date.getMonth()+1))}/`
+        var ossDir = `upload/images/${date.getFullYear()+''+(date.getMonth()<9?'0'+(date.getMonth()+1):(date.getMonth()+1))}/`
         co(function* () {
           ossClient.useBucket('one-project');
           var result = yield ossClient.put(ossDir+key, localFile);

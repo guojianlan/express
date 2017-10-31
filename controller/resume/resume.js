@@ -88,6 +88,7 @@ class Resume {
     //传resumeId查找数据
     var resume_doc = await ResumeModel.findById(req.session.user.resumeId);
     var base = _.pick(resume_doc, this.baseArr);
+    base.header_img = base.header_img || 'https://pic.yy5b.com/upload/images/default/header_default.png';
     var target = _.pick(resume_doc, this.targetArr);
     var baseIntro = _.cloneDeep(_.result(resume_doc, 'baseIntro'))
     var skill = _.cloneDeep(_.result(resume_doc, 'skill'))
