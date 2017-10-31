@@ -3,16 +3,22 @@ var Hashes = require('jshashes');
 var fs = require('fs');
 import ResumeModel from '../../models/Resume.js'
 import UserModel from '../../models/User'
-var qiniu = require('qiniu');
 var Geetest = require('gt3-sdk');
-var bucket = 'resume-project'; //上传名字
-const accessKey = 'bu8QA-YZMrPmJisQdZuKq3inoi2T94U5WWIv9jkl';
-const secretKey = '7jeil1iGqsrHCYhIs45o0LrurKBtEfI6qvXE-VF-';
 const nodemailer = require('nodemailer');
 const SMSClient = require('@alicloud/sms-sdk');
 const redisConfig = require('config').get('redis');
+const OSS = require('ali-oss');
+const co = require('co');
 const accessKeyId = 'LTAIAEuuEXE27O5p';
 const secretAccessKey = 'mLMCKYSbT3YxChw6WwVxyqeTOh9QOg';
+const ossClient = new OSS({
+  region: 'oss-cn-shenzhen',
+  endpoint:"http://pic.yy5b.com",
+  accessKeyId: accessKeyId,
+  accessKeySecret: secretAccessKey,
+  cname:true
+});
+
 let smsClient = new SMSClient({
   accessKeyId,
   secretAccessKey
@@ -25,16 +31,6 @@ bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 var _ = require('lodash')
 // var client = redis.createClient();
-var qnDomain = 'http://pic.yy5b.com/'
-var mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
-var options = {
-  scope: bucket,
-};
-var putPolicy = new qiniu.rs.PutPolicy(options);
-var uploadToken = putPolicy.uploadToken(mac);
-var config = new qiniu.conf.Config();
-// 空间对应的机房
-config.zone = qiniu.zone.Zone_z0;
 var captcha = new Geetest({
   geetest_id: '92e28d27290f0019359ffe9730a8198e',
   geetest_key: '934b04a031323d0c65de11f3fc227480'
@@ -305,40 +301,35 @@ class user {
     var filePath = 'uploads/' + fileName
     fs.writeFile(filePath, imageBuffer.data, function (err) { //用fs写入文件
       if (err) {
-        console.log(err);
+        return res.send(utils.resErrorCode({
+          error:err
+        }))
       } else {
         var localFile = filePath;
-        var formUploader = new qiniu.form_up.FormUploader(config);
-        var putExtra = new qiniu.form_up.PutExtra();
         var key = fileName;
-        formUploader.putFile(uploadToken, key, localFile, putExtra, function (respErr,
-          respBody, respInfo) {
-          if (respErr) {
-            res.send(utils.resErrorCode({
-              msg: '上传失败',
-              error: respErr
-            }))
-          }
-
-          if (respInfo.statusCode == 200) {
-            var imageSrc = respBody.key;
-            res.send(utils.resSuccessCode({
-              data: {
-                imageUrl: imageSrc
-              }
-            }))
-          } else {
-            res.send(utils.resErrorCode({
-              msg: '上传失败',
-              data: respInfo
-            }))
-          }
-          // 上传之后删除本地文件
+        var date = new Date();
+        var ossDir = f `upload/images/${date.getFullYear()+''+(date.getMonth()<9?'0'+(date.getMonth()+1):(date.getMonth()+1))}/`
+        co(function* () {
+          ossClient.useBucket('one-project');
+          var result = yield ossClient.put(ossDir+key, localFile);
           fs.unlinkSync(filePath);
+          return res.send(utils.resSuccessCode({
+            data: {
+              imageUrl: result.url
+            },
+            result:result
+          }))
+          
+        }).catch(function (err) {
+          fs.unlinkSync(filePath);
+          return res.send(utils.resErrorCode({
+            error:err
+          }))
         });
+        
+        
       }
     })
-
   }
   async forgetPass(req, res, next) {
     res.cookie('isVisit', 1, {

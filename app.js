@@ -66,7 +66,7 @@ router(app);
 app.use('/ceshiPage', (req, res) => {
   return res.render(path.join(__dirname,'public','ceshiPage/index.html'));
 })
-app.use('/preview',(req,res)=>{
+app.use('/page/preview',(req,res)=>{
   return res.render(path.join(__dirname,'public','template/viewer.html'),{
     cvUrl:'/uploads/out4.pdf'
   });
