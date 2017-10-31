@@ -65,7 +65,7 @@ var getIPAdress = function () {
 router(app);
 app.use('/page/preview',(req,res)=>{
   return res.render(path.join(__dirname,'public','template/viewer.html'),{
-    cvUrl:'/uploads/out4.pdf'
+    cvUrl:'https://pic.yy5b.com/pdf/out4.pdf'
   });
 })
 app.use('*', (req, res) => {
